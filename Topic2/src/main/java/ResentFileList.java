@@ -1,27 +1,31 @@
 import java.util.*;
 
 public class ResentFileList{
-    List<String> myList;
+    private SortedSet<File> myFilesList;
+    private Comparator<File> byDate =
+            Comparator.comparing(File::getDate);
 
     public ResentFileList(){
-        myList = new ArrayList<>();
+        myFilesList = new TreeSet<>(byDate);
     }
 
-    public List<String> getMyList(){
-        return myList;
+    public SortedSet<File> getMyFilesList(){
+        return myFilesList;
     }
 
-    public void newOpenFile(String string) {
-        if(myList.size() != 15) {
-            if (this.myList.contains(string)) {
-                myList.add(string);
-                myList.remove(myList.lastIndexOf(string));
-            } else {
-                myList.add(string);
+
+    
+    public void newOpenFile(File myFile) {
+        if(myFilesList.size() != 15) {
+            for(File aFile : myFilesList){
+                if(myFile.getFile() == aFile.getFile()){
+                    myFilesList.remove(aFile);
+                }
             }
+            myFilesList.add(myFile);
         }else{
-            myList.remove(0);
-            myList.add(string);
+            myFilesList.remove(myFilesList.first());
+            myFilesList.add(myFile);
         }
     }
 }
