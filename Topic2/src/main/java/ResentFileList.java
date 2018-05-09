@@ -1,30 +1,35 @@
+import sun.awt.geom.AreaOp;
+
 import java.util.*;
 
 public class ResentFileList{
-    private SortedSet<File> myFilesList;
-    private Comparator<File> byDate =
-            Comparator.comparing(File::getDate);
+    private List<File> myFilesList;
 
     public ResentFileList(){
-        myFilesList = new TreeSet<>(byDate);
+        myFilesList = new ArrayList<>();
+        Comparator<File> groupByComparator = Comparator.comparing(File::getDate)
+                .thenComparing(File::getFile);
+        myFilesList.sort(groupByComparator);
     }
 
-    public SortedSet<File> getMyFilesList(){
+    public List<File> getMyFilesList(){
         return myFilesList;
     }
 
 
     
     public void newOpenFile(File myFile) {
+        File fileToRemove = null;
         if(myFilesList.size() != 15) {
             for(File aFile : myFilesList){
-                if(myFile.getFile() == aFile.getFile()){
-                    myFilesList.remove(aFile);
-                }
+                if(aFile.getFile() == myFile.getFile())
+                    fileToRemove = aFile;
             }
+            myFilesList.remove(fileToRemove);
             myFilesList.add(myFile);
+
         }else{
-            myFilesList.remove(myFilesList.first());
+            myFilesList.remove(myFilesList.get(0));
             myFilesList.add(myFile);
         }
     }

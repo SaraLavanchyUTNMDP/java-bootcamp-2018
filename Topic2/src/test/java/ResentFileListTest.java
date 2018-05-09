@@ -1,10 +1,7 @@
 import org.junit.Assert;
 import org.junit.Before;
 import  org.junit.Test;
-import sun.util.calendar.Gregorian;
-
 import java.util.Date;
-import java.util.Stack;
 
 public class ResentFileListTest {
 
@@ -32,14 +29,14 @@ public class ResentFileListTest {
     // that for my computer they run at the same Time.
     @Test
     public void openFileAgain(){
-        File myFile= new File(new Date().toInstant().plusMillis(51), "myFile");
-        File otherFile = new File(new Date().toInstant().plusMillis(1), "mySecondFile");
+        File myFile= new File(new Date().toInstant(), "myFile");
+        File otherFile = new File(new Date().toInstant(), "mySecondFile");
         myList.newOpenFile(otherFile);
         myList.newOpenFile(myFile);
-        File myFileAgain = new File(new  Date().toInstant().plusMillis(100), "myFile");
+        File myFileAgain = new File(new  Date().toInstant(), "myFile");
         myList.newOpenFile(myFileAgain);
         Assert.assertTrue(myList.getMyFilesList().contains(otherFile));
-        Assert.assertEquals(myFileAgain, myList.getMyFilesList().last());
+        Assert.assertEquals(myFileAgain, myList.getMyFilesList().get(myList.getMyFilesList().size()-1));
         Assert.assertEquals( 2, myList.getMyFilesList().size());
     }
 
