@@ -1,9 +1,5 @@
-import Proxy.Proxy;
-import models.Course;
-import models.Schedule;
-import repository.HighSchoolRepository;
+import proxy.Proxy;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -16,7 +12,7 @@ public class Main {
         System.out.print("Please insert the teacher's name: ");
         teacherName = entrada.nextLine();
 
-
+        anDataBaseProxy.getCourse(1);
         anDataBaseProxy.showSchedule(teacherName);
 
 

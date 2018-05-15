@@ -14,7 +14,4 @@ public class Course {
         this.weekHour = hours;
     }
 
-    public String getName() {
-        return this.name;
-    }
 }

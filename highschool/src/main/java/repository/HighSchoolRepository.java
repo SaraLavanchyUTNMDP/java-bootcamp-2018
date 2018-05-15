@@ -5,7 +5,6 @@ import models.Schedule;
 
 import java.io.FileInputStream;
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,7 +19,8 @@ public class HighSchoolRepository {
         try{
             this.myConnection =myConnection.getInstance();
             this.myQueries = new Properties();
-            this.myQueries.load(new FileInputStream("config/myQueries.properties"));
+            this.myQueries.load(new FileInputStream("src/main/resources/myQueries.properties"));
+
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -32,15 +32,13 @@ public class HighSchoolRepository {
         try {
             String sql = myQueries.getProperty("query.schedule_teachers");
             CallableStatement teacherAndSchedule = myConnection.getConexion().prepareCall(sql);
-
             teacherAndSchedule.setString(1,name);
             teacherAndSchedule.execute();
             ResultSet theTandScheduleTable = teacherAndSchedule.getResultSet();
             while(theTandScheduleTable.next()){
-                Schedule oneLine = new Schedule(theTandScheduleTable.getString(1),
+                schedulesAndTeacher.add(new Schedule(theTandScheduleTable.getString(1),
                         theTandScheduleTable.getString(2), theTandScheduleTable.getString(3),
-                        theTandScheduleTable.getString(4), theTandScheduleTable.getString(5));
-                schedulesAndTeacher.add(oneLine);
+                        theTandScheduleTable.getString(4), this.getCourse(theTandScheduleTable.getInt(5))));
             }
         }catch(SQLException e){
             e.getSQLState();
@@ -48,12 +46,12 @@ public class HighSchoolRepository {
         return schedulesAndTeacher;
     }
 
-    public Course getCourse(String name){
+    public Course getCourse(int idName){
         Course course = null;
         try{
             String sql = myQueries.getProperty("query.get_course");
             CallableStatement anCourse = myConnection.getConexion().prepareCall(sql);
-            anCourse.setString(1,name);
+            anCourse.setInt(1,idName);
             anCourse.execute();
             ResultSet theCourse = anCourse.getResultSet();
             if(theCourse.next()){
