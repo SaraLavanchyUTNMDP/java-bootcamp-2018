@@ -1,6 +1,7 @@
 package com.bootcamp2018.shoppingapi.model;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class ItemLines {
     private Item myItem;
@@ -26,7 +27,7 @@ public class ItemLines {
     @Override
     public boolean equals(Object o) {
         boolean areEquals = false;
-        if(o != null && o instanceof Item){
+        if(!Objects.isNull(o) && o instanceof Item){
             if((o.equals(this.myItem))){
                 areEquals =true;
             }

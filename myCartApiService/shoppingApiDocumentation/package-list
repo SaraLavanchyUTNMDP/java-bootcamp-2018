@@ -1,0 +1,5 @@
+com.bootcamp2018.shoppingapi
+com.bootcamp2018.shoppingapi.controller
+com.bootcamp2018.shoppingapi.model
+com.bootcamp2018.shoppingapi.repository
+com.bootcamp2018.shoppingapi.service
