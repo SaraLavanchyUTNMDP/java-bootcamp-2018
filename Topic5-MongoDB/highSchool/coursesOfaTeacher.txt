@@ -1,0 +1,5 @@
+function (teacher){
+        return db.getCollection('teachers').find(
+        { surname : {$eq : teacher}},{_id : 0, name: 0, surname: 0, birth_date: 0}
+        ).sort({"courses.course.name":1}).pretty().toArray();
+ }

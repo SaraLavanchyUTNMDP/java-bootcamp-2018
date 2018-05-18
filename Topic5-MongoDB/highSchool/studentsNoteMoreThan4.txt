@@ -1,0 +1,9 @@
+function (course){
+        return db.getCollection('students').find(
+    {$and: 
+        [{ "courses.partial1" : { $gt : 4}},
+        { "courses.partial2" : { $gt : 4}},
+        { "courses.partial3" : { $gt : 4}},
+        {"courses.course.name" : {$eq : course}}
+        ]}).pretty().toArray();
+ }
