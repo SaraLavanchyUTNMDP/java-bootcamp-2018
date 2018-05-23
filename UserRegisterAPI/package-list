@@ -1,0 +1,6 @@
+com.bootcampglobant.userregister
+com.bootcampglobant.userregister.config
+com.bootcampglobant.userregister.controller
+com.bootcampglobant.userregister.models
+com.bootcampglobant.userregister.repository
+com.bootcampglobant.userregister.service
