@@ -2,11 +2,12 @@ package com.bootcampglobant.userregister;
 
 import com.bootcampglobant.userregister.controller.UserService;
 import com.bootcampglobant.userregister.models.User;
-import com.bootcampglobant.userregister.service.UserController;
+import com.bootcampglobant.userregister.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.text.SimpleDateFormat;
@@ -17,17 +18,16 @@ import java.util.List;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class UserControllerTests {
-
+public class UserServiceTest {
 	@Mock
-	UserService service;
-	UserController myController;
-
+	UserRepository userRepository;
+	UserService userService;
+	
 	@Before
-	public void creatingController(){
+	public void requiredThingToRunTests(){
+		userService = new UserService();
 		MockitoAnnotations.initMocks(this);
-		myController = new UserController();
-		myController.setUserService(service);
+		userService.setUserRepository(userRepository);
 	}
 
 	@Test
@@ -35,20 +35,21 @@ public class UserControllerTests {
 		List<User> myList = new ArrayList<>();
 		User u = new User("juan", "juan0", "1234", "some@mail.com", "1998-02-01");
 
-		myController.addUser("juan", "juan0", "1234", "some@mail.com", "1998-02-01");
+		when(userRepository.findOneByUsername("juan0")).thenReturn(null);
+		userService.newUser("juan", "juan0", "1234", "some@mail.com", "1998-02-01");
 		myList.add(u);
 
-		verify(service).newUser("juan", "juan0", "1234", "some@mail.com", "1998-02-01");
-		when(service.getAll()).thenReturn(myList);
-		
-		Assert.assertNotNull(myController.getAllUsers().get(0));
-		Assert.assertEquals(myController.getAllUsers().size(), 1);
-		Assert.assertEquals( "juan", myController.getAllUsers().get(0).getName());
-		Assert.assertEquals("juan0", myController.getAllUsers().get(0).getUsername());
-		Assert.assertEquals("1234", myController.getAllUsers().get(0).getPassword());
-		Assert.assertEquals("some@mail.com", myController.getAllUsers().get(0).getEmail());
+		verify(userRepository).save(u);
+		when(userRepository.findAll()).thenReturn(myList);
 
-		Date birthDate = myController.getAllUsers().get(0).getBirthDate();
+		Assert.assertNotNull(userService.getAll().get(0));
+		Assert.assertEquals(userService.getAll().size(), 1);
+		Assert.assertEquals( "juan", userService.getAll().get(0).getName());
+		Assert.assertEquals("juan0", userService.getAll().get(0).getUsername());
+		Assert.assertEquals("1234", userService.getAll().get(0).getPassword());
+		Assert.assertEquals("some@mail.com", userService.getAll().get(0).getEmail());
+
+		Date birthDate = userService.getAll().get(0).getBirthDate();
 		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 		String date1 = date.format(birthDate);
 
@@ -56,26 +57,29 @@ public class UserControllerTests {
 	}
 
 	@Test
-	public void getAllusersTest(){
+	public void getAllTest(){
 		List<User> myList = new ArrayList<>();
 		List<User> myUserList;
 		User u = new User("juan", "juan0", "1234", "some@mail.com", "1998-02-01");
 		myList.add(u);
-		when(service.getAll()).thenReturn(myList);
+		when(userRepository.findAll()).thenReturn(myList);
 
-		myUserList = myController.getAllUsers();
-		verify(service).getAll();
+		myUserList = userService.getAll();
+		verify(userRepository).findAll();
 		Assert.assertNotNull(myList);
 		Assert.assertEquals(1, myUserList.size());
 	}
 
 	@Test
-	public void getUserByNameTest(){
-		when(service.findAnUserByName("juan"))
-				.thenReturn(new User("juan", "juan0", "1234", "some@mail.com", "1998-02-01"));
+	public void findAnUserByNameTest(){
+		List<User> users = new ArrayList<>();
+		users.add(new User("juan", "juan0", "1234", "some@mail.com", "1998-02-01"));
 
-		User user = myController.getByName("juan");
-		verify(service).findAnUserByName("juan");
+		when(userRepository.findByName("juan"))
+				.thenReturn(users);
+
+		User user = userService.findAnUserByName("juan");
+		verify(userRepository).findByName("juan");
 		Assert.assertNotNull(user);
 		Assert.assertEquals( "juan", user.getName());
 		Assert.assertEquals("juan0", user.getUsername());
@@ -90,11 +94,11 @@ public class UserControllerTests {
 	}
 
 	@Test
-	public void getUserByUsernameTest() {
-		when(service.findAnUser("juan0"))
+	public void findUserByUsernameTest() {
+		when(userRepository.findOneByUsername("juan0"))
 				.thenReturn(new User("juan", "juan0", "1234", "some@mail.com", "1998-02-01"));
-		User user = myController.getByUsername("juan0");
-		verify(service).findAnUser("juan0");
+		User user = userService.findAnUser("juan0");
+		verify(userRepository).findOneByUsername("juan0");
 		Assert.assertNotNull(user);
 		Assert.assertEquals( "juan", user.getName());
 		Assert.assertEquals("juan0", user.getUsername());
@@ -110,10 +114,10 @@ public class UserControllerTests {
 
 	@Test
 	public void deleteAnUserTest(){
-		when(service.getAll()).thenReturn(null);
-		myController.deleteAnUser("juan0");
-		verify(service).deleteUser("juan0");
-		Assert.assertNull(myController.getAllUsers());
+		when(userRepository.findAll()).thenReturn(null);
+		userService.deleteUser("juan0");
+		verify(userRepository).deleteByUsername("juan0");
+		Assert.assertNull(userService.getAll());
 	}
 
 
