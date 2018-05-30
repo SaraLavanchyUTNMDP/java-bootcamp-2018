@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-@Data
+
 @Service
 public class CategoryService {
 	@Autowired

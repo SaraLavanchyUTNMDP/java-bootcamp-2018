@@ -1,14 +1,15 @@
 package com.bootcamp2018.shoppingapi.controller;
 
+import com.bootcamp2018.shoppingapi.Request.ItemRequest;
 import com.bootcamp2018.shoppingapi.model.Item;
 import com.bootcamp2018.shoppingapi.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -17,29 +18,50 @@ public class ItemController {
 	@Autowired
 	ItemService itemService;
 
-	@RequestMapping(method = RequestMethod.POST)
-	public void add(@RequestParam("description") String description, @RequestParam("price") Double price,
-			@RequestParam("category") String category){
-			itemService.addItem(description, price, category);
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity add(@RequestBody ItemRequest request){
+		try {
+			itemService.addItem(request.getDescription(), request.getPrice(), request.getCategory());
+			return new ResponseEntity(HttpStatus.CREATED);
+		} catch (Exception e){
+			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
-	public Item findItem(@RequestParam("description") String description){
-		return itemService.getItem(description);
+	@RequestMapping(value="{description}", method = RequestMethod.GET)
+	public ResponseEntity<Item> findItem(HttpServletRequest request, @PathVariable("description") String description){
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		headers.add("Responded", "ItemController");
+		Item item = itemService.getItem(description);
+		return ResponseEntity.accepted().headers(headers).body(item);
 	}
 
-	@RequestMapping(value="/category", method = RequestMethod.GET)
-	public List<Item> findItemByCategory(@RequestParam("category") String category){
-		return itemService.findByCategory(category);
+	@RequestMapping(value="/category/{category}", method = RequestMethod.GET)
+	public ResponseEntity<List<Item>> findItemByCategory(HttpServletRequest request, @PathVariable("category") String category){
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		headers.add("Responded", "ItemController");
+		List<Item> items = itemService.findByCategory(category);
+		return ResponseEntity.accepted().headers(headers).body(items);
 	}
 
-	@RequestMapping(method = RequestMethod.PATCH)
-	public void changePrice(@RequestParam("price") double newPrice, @RequestParam("description") String description){
+	@RequestMapping(value="{description}/{price}", method = RequestMethod.PATCH)
+	public ResponseEntity changePrice(@PathVariable("price") double newPrice, @PathVariable("description") String description){
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		headers.add("Responded", "ItemController");
 		itemService.updatePrice(newPrice,description);
+		return ResponseEntity.accepted().headers(headers).body(itemService.getItem(description));
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE)
-	public void deleteItem(@RequestParam("description") String description){
-		itemService.deleteItem(description);
+	@RequestMapping(value= "{description}", method = RequestMethod.DELETE)
+	public ResponseEntity deleteItem(@PathVariable("description") String description){
+		try {
+			itemService.deleteItem(description);
+			return new ResponseEntity(HttpStatus.ACCEPTED);
+		}catch (Exception e){
+			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
